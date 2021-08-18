@@ -1,0 +1,29 @@
+<%- include('header', {title: `Submit Note`}); -%>
+
+  <h1 style="text-align: center">Submit Birding Note</h1>
+  <div class="container">
+    <form action="/sighting" method="POST">
+      <div class="col-md-12 mb-3 submit-label">
+        <label for="details" class="form-label">Text</label>
+        <textarea class="form-control" name="details" rows="3"></textarea>
+      </div>
+      <div class="col-md-12 mb-3 submit-label">
+        <label for="behavior" class="form-label">Text</label>
+        <textarea class="form-control" name="behavior" rows="3"></textarea>
+      </div>
+      <div class="col-md-12 mb-3 submit-label">
+        <label for="flocksize" class="form-label">Text</label>
+        <textarea class="form-control" name="flocksize" rows="3"></textarea>
+      </div>
+      <div class="col-md-12">
+        <input type="submit" value="Submit">
+      </div>
+      <br>
+      <div class="col-md-12">
+        <input type="reset">
+      </div>
+      <br>
+      <br>
+      <br>
+
+      <%- include('footer'); -%>

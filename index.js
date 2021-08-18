@@ -26,7 +26,7 @@ const pgConnectionConfigs = {
 const pool = new Pool(pgConnectionConfigs);
 
 const renderNotesIndex = (request, response) => {
-  console.log('request came in');
+  console.log('index request came in');
 
   const listAllNotes = (error, result) => {
     const data = result.rows;
@@ -48,7 +48,7 @@ const renderNotesIndex = (request, response) => {
 };
 
 const renderSpecificNote = (request, response) => {
-  console.log('request came in');
+  console.log('note request came in');
   const { id } = request.params;
 
   const listSpecificNote = (error, result) => {
@@ -64,14 +64,23 @@ const renderSpecificNote = (request, response) => {
     console.log(`result: ${dataObj}`);
 
     // response.send(data);
-    response.render('index', dataObj);
+    response.render('rendernote', dataObj);
   };
 
   // Query using pg.Pool instead of pg.Client
   pool.query(`SELECT * from notes WHERE id = ${id} `, listSpecificNote);
 };
 
+const renderNoteSubmission = (request, response) => {
+  console.log('submit request came in');
+  response.render('renderform');
+};
+
+// // Query using pg.Pool instead of pg.Client
+// pool.query(`SELECT * from notes WHERE id = ${id} `, listSpecificNote);
+
 app.get('/', renderNotesIndex);
 app.get('/note/:id', renderSpecificNote);
+app.get('/note', renderNoteSubmission);
 
 app.listen(3004);
