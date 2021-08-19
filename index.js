@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import express, { request, response } from 'express';
 import methodOverride from 'method-override';
 // eslint-disable-next-line import/no-unresolved
@@ -60,9 +61,9 @@ const renderSpecificNote = (request, response) => {
       response.status(503).send(result.rows);
       return;
     }
-    console.log(data);
+    // console.log(data);
     const dataObj = { data };
-    console.log(`result: ${dataObj}`);
+    // console.log(`result: ${dataObj}`);
 
     // response.send(data);
     response.render('rendernote', dataObj);
@@ -74,6 +75,10 @@ const renderSpecificNote = (request, response) => {
 
 // CB to render blank note submission form
 const renderNoteSubmission = (request, response) => {
+  // if (request.cookies.loggedIn === undefined) {
+  //   response.status(403).send('sorry, please log in!');
+  //   return;
+  // }
   console.log('submit request came in');
   response.render('submitnote');
 };
@@ -121,6 +126,54 @@ const renderLogin = (request, response) => {
   response.render('login');
 };
 
+const loginAccount = (request, response) => {
+  console.log('trying to login');
+  const values = [request.body.email];
+  console.log(values);
+  pool.query('SELECT * FROM users WHERE email=$1', values, (error, result) => {
+    if (error) {
+      console.log('Error executing query', error.stack);
+      response.status(503).send(result.rows);
+      return;
+    }
+
+    if (result.rows.length === 0) {
+      /* we didnt find a user with that email.
+       the error for password and user are the same. don't tell the user which error they got for security reasons, otherwise people can guess if a person is a user of a given service. */
+      response.status(403).send('sorry!');
+      return;
+    }
+
+    const user = result.rows[0];
+
+    if (user.password === request.body.password) {
+      console.log('login successful');
+      response.cookie('userId', user.id);
+      response.cookie('loggedIn', true);
+      response.redirect('/loginsuccess');
+    } else {
+      // password didn't match
+      // the error for password and user are the same. don't tell the user which error they got for security reasons, otherwise people can guess if a person is a user of a given service.
+      response.status(403).send('sorry!!');
+    }
+  });
+};
+
+// CB to render successful login page
+const successfulLogin = (request, response) => {
+  console.log('login request came in');
+  response.render('loginsuccess');
+};
+
+// CB to del sighting
+const logout = (request, response) => {
+  // Remove element from DB at given index
+  response.clearCookie('loggedIn');
+  response.clearCookie('userId');
+  // request.logout();
+  response.redirect('/');
+};
+
 app.get('/', renderNotesIndex);
 app.get('/note/:id', renderSpecificNote);
 app.get('/note', renderNoteSubmission);
@@ -128,5 +181,8 @@ app.post('/note', addNewNote);
 app.get('/signup', renderRegistration);
 app.post('/signup', registerUser);
 app.get('/login', renderLogin);
+app.post('/login', loginAccount);
+app.get('/loginsuccess', successfulLogin);
+app.get('/logout', logout);
 
 app.listen(3004);
