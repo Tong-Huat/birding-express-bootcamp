@@ -2,7 +2,6 @@ import express, { request, response } from 'express';
 import methodOverride from 'method-override';
 // eslint-disable-next-line import/no-unresolved
 import pg from 'pg';
-// import { read, add, write } from './jsonFileStorage.js';
 
 // const PORT = process.argv[2];
 
@@ -25,6 +24,7 @@ const pgConnectionConfigs = {
 
 const pool = new Pool(pgConnectionConfigs);
 
+// CB to render index page with all the notes
 const renderNotesIndex = (request, response) => {
   console.log('index request came in');
 
@@ -47,6 +47,7 @@ const renderNotesIndex = (request, response) => {
   pool.query('SELECT * from notes', listAllNotes);
 };
 
+// CB to render specifi note request
 const renderSpecificNote = (request, response) => {
   console.log('note request came in');
   const { id } = request.params;
@@ -71,11 +72,13 @@ const renderSpecificNote = (request, response) => {
   pool.query(`SELECT * from notes WHERE id = ${id} `, listSpecificNote);
 };
 
+// CB to render blank note submission form
 const renderNoteSubmission = (request, response) => {
   console.log('submit request came in');
-  response.render('renderform');
+  response.render('submitnote');
 };
 
+// CB to add new note filled by user
 const addNewNote = (request, response) => {
   const { date } = request.body;
   const { behaviour } = request.body;
@@ -91,8 +94,39 @@ const addNewNote = (request, response) => {
   });
 };
 
+// CB to render blank note submission form
+const renderRegistration = (request, response) => {
+  console.log('registration request came in');
+  response.render('signuppage');
+};
+
+// CB to retrieve user's data for registration
+const registerUser = (request, response) => {
+  console.log('retrieving user data');
+  const { email } = request.body;
+  const { password } = request.body;
+  const insertData = `INSERT INTO users (email, password) VALUES ('${email}', '${password}')`;
+
+  pool.query(insertData, (err, result, fields) => {
+    if (err) {
+      return response.status(500).send(err); /* return error message if insert unsuccessful */
+    }
+    response.redirect('/login');
+  });
+};
+
+// CB to render blank note submission form
+const renderLogin = (request, response) => {
+  console.log('login request came in');
+  response.render('login');
+};
+
 app.get('/', renderNotesIndex);
 app.get('/note/:id', renderSpecificNote);
 app.get('/note', renderNoteSubmission);
 app.post('/note', addNewNote);
+app.get('/signup', renderRegistration);
+app.post('/signup', registerUser);
+app.get('/login', renderLogin);
+
 app.listen(3004);
