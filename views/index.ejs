@@ -5,6 +5,7 @@
     <thead>
       <tr class="thead">
         <th scope="col">Report</th>
+        <th scope="col">Date</th>
         <th scope="col">Summary</th>
         <th scope="col" colspan="2">Actions</th>
       </tr>
@@ -18,15 +19,18 @@
           </th>
           <td class="tdata">
             <a href="<%= `/note/${i + 1}` %>">
-              <%= data[i].details %>
+              <%= data[i].date %>
             </a>
+          </td>
+          <td class="tdata">
+            <%= data[i].behaviour %>
           </td>
           <td>
             <form action="/note/<%= i %>?_method=DELETE" method="POST">
-              <input type="submit" value="Delete" />
+              <input disabled type="submit" value="Delete" />
             </form>
           </td>
-          <td><button><a href="/note/<%= i+1 %>/edit"> Edit </a></button>
+          <td><button disabled><a href="#"> Edit </a></button>
           </td>
         </tr>
         <% }; %>

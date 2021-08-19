@@ -76,11 +76,23 @@ const renderNoteSubmission = (request, response) => {
   response.render('renderform');
 };
 
-// // Query using pg.Pool instead of pg.Client
-// pool.query(`SELECT * from notes WHERE id = ${id} `, listSpecificNote);
+const addNewNote = (request, response) => {
+  const { date } = request.body;
+  const { behaviour } = request.body;
+  const { flocksize } = request.body;
+  const insertData = `INSERT INTO notes (date, behaviour, flocksize) VALUES ('${date}', '${behaviour}', '${flocksize}')`;
+
+  pool.query(insertData, (err, result, fields) => {
+    if (err) {
+      return response.status(500).send(err); /* return error message if insert unsuccessful */
+    }
+    console.log(`length:${result.rows.length}`);
+    response.redirect('/');
+  });
+};
 
 app.get('/', renderNotesIndex);
 app.get('/note/:id', renderSpecificNote);
 app.get('/note', renderNoteSubmission);
-
+app.post('/note', addNewNote);
 app.listen(3004);

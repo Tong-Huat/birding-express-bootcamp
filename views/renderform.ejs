@@ -2,17 +2,17 @@
 
   <h1 style="text-align: center">Submit Birding Note</h1>
   <div class="container">
-    <form action="/sighting" method="POST">
+    <form action="/note" method="POST">
       <div class="col-md-12 mb-3 submit-label">
-        <label for="details" class="form-label">Text</label>
-        <textarea class="form-control" name="details" rows="3"></textarea>
+        <label for="date" class="form-label">Date</label>
+        <textarea type="date" class="form-control" name="date" rows="3" placeholder="yyyy-mm-dd"></textarea>
       </div>
       <div class="col-md-12 mb-3 submit-label">
-        <label for="behavior" class="form-label">Text</label>
-        <textarea class="form-control" name="behavior" rows="3"></textarea>
+        <label for="behaviour" class="form-label">Behaviour</label>
+        <textarea class="form-control" name="behaviour" rows="3"></textarea>
       </div>
       <div class="col-md-12 mb-3 submit-label">
-        <label for="flocksize" class="form-label">Text</label>
+        <label for="flocksize" class="form-label">Flock Size</label>
         <textarea class="form-control" name="flocksize" rows="3"></textarea>
       </div>
       <div class="col-md-12">

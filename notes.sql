@@ -1,8 +1,8 @@
-CREATE TABLE notes (id SERIAL PRIMARY KEY, details TEXT, behaviour TEXT, flocksize TEXT);
+CREATE TABLE notes (id SERIAL PRIMARY KEY, date DATE, behaviour TEXT, flocksize INTEGER);
 
-SELECT * FROM birding;
+SELECT * FROM notes;
 
-INSERT INTO notes (details, behaviour, flocksize) VALUES ('4th August, friday, watched the bird feeding for 5mins with clear views', 'feeding and resting', '10 birds');
-INSERT INTO notes (details, behaviour, flocksize) VALUES ('4th Sep, friday, watched the bird feeding for 5mins with clear views', 'feeding and resting', '4 birds, same species');
-INSERT INTO notes (details, behaviour, flocksize) VALUES ('4th July, friday, watched the bird feeding for 5mins with clear views', 'feeding and resting', '7 birds, part of mixed flocks');
-INSERT INTO notes (details, behaviour, flocksize) VALUES ('4th Dec, friday, watched the bird feeding for 5mins with clear views', 'feeding and resting', '20 birds, same flock and species');
+INSERT INTO notes (date, behaviour, flocksize) VALUES ('2021-01-27', 'watched a flock of yellow birds feeding for 5mins with clear views', 10);
+INSERT INTO notes (date, behaviour, flocksize) VALUES ('2021-02-23', 'watched the birds flying for 5mins with clear views', 4);
+INSERT INTO notes (date, behaviour, flocksize) VALUES ('2021-03-18', 'watched the birds resting for 5mins with clear views', 7);
+INSERT INTO notes (date, behaviour, flocksize) VALUES ('2021-04-05', 'watched the bird foraging for 7mins with clear views', 20);
