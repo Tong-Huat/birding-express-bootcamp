@@ -3,7 +3,7 @@ import express, { request, response } from 'express';
 import methodOverride from 'method-override';
 // eslint-disable-next-line import/no-unresolved
 import pg from 'pg';
-
+import jsSHA from 'jssha';
 // const PORT = process.argv[2];
 
 const app = express();
@@ -79,22 +79,40 @@ const renderNoteSubmission = (request, response) => {
   //   response.status(403).send('sorry, please log in!');
   //   return;
   // }
-  console.log('submit request came in');
-  response.render('submitnote');
+  pool.query('SELECT * FROM species', (error, result) => {
+    const data = { species: result.rows };
+
+    console.log('submit request came in');
+    response.render('submitnote', data);
+  });
 };
 
 // CB to add new note filled by user
 const addNewNote = (request, response) => {
+  const cookiesArray = request.headers.cookie.split(';').map((cookie) => cookie.trim());
+  const cookiesHashmap = cookiesArray.reduce((all, cookie) => {
+    const [cookieName, value] = cookie.split('=');
+    return {
+      [cookieName]: value,
+      ...all,
+    };
+  }, {});
+  console.log(`3:${cookiesHashmap.userId}`);
+  const { userId } = cookiesHashmap;
+  console.log(`2:${userId}`);
   const { date } = request.body;
   const { behaviour } = request.body;
   const { flocksize } = request.body;
-  const insertData = `INSERT INTO notes (date, behaviour, flocksize) VALUES ('${date}', '${behaviour}', '${flocksize}')`;
+  // const { userId } = obj;
+  const insertData = `INSERT INTO notes (date, behaviour, flocksize, user_id) VALUES ('${date}', '${behaviour}', '${flocksize}', '${userId}')`;
+  // console.log(`1:${Number(userId)}`);
 
   pool.query(insertData, (err, result, fields) => {
     if (err) {
       return response.status(500).send(err); /* return error message if insert unsuccessful */
     }
     console.log(`length:${result.rows.length}`);
+
     response.redirect('/');
   });
 };
@@ -120,12 +138,13 @@ const registerUser = (request, response) => {
   });
 };
 
-// CB to render blank note submission form
+// CB to render login form
 const renderLogin = (request, response) => {
   console.log('login request came in');
   response.render('login');
 };
 
+// CB to verify login details and login to acct if successful verification
 const loginAccount = (request, response) => {
   console.log('trying to login');
   const values = [request.body.email];
@@ -165,12 +184,11 @@ const successfulLogin = (request, response) => {
   response.render('loginsuccess');
 };
 
-// CB to del sighting
+// CB to del cookies and logout
 const logout = (request, response) => {
-  // Remove element from DB at given index
+  // Remove cookies from response header to log out
   response.clearCookie('loggedIn');
   response.clearCookie('userId');
-  // request.logout();
   response.redirect('/');
 };
 
@@ -186,3 +204,11 @@ app.get('/loginsuccess', successfulLogin);
 app.get('/logout', logout);
 
 app.listen(3004);
+
+const shaObj = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
+// 'Text to hash" is the string to be converted
+shaObj.update('Text to hash.');
+const hash = shaObj.getHash('HEX');
+
+console.log('hashed text');
+console.log(hash);
