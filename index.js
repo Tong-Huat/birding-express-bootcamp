@@ -74,15 +74,18 @@ const renderSpecificNote = (request, response) => {
 
 // CB to render blank note submission form
 const renderNoteSubmission = (request, response) => {
+  console.log('submit request came in');
   // if (request.cookies.loggedIn === undefined) {
   //   response.status(403).send('sorry, please log in!');
   //   return;
   // }
   pool.query('SELECT * FROM species', (error, result) => {
     const data = { species: result.rows };
-
-    console.log('submit request came in');
-    response.render('submitnote', data);
+    pool.query('SELECT * FROM birds_behaviours', (behaviourError, behaviourResult) => {
+      const data2 = { behaviours: behaviourResult.rows };
+      console.log(data2);
+      response.render('submitnote', { data, data2 });
+    });
   });
 };
 

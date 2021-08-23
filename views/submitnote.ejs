@@ -12,6 +12,14 @@
         <textarea class="form-control" name="behaviour" rows="3"></textarea>
       </div>
       <div class="col-md-12 mb-3 submit-label">
+        <% data2.behaviours.forEach((behaviour)=> { %>
+          <label>
+            <%= behaviour.birds_behaviour %>
+          </label>
+          <input type="checkbox" name="birdsBehavioursId" value="<%= behaviour.id %>" />
+          <% }); %>
+      </div>
+      <div class="col-md-12 mb-3 submit-label">
         <label for="flocksize" class="form-label">Flock Size</label>
         <textarea class="form-control" name="flocksize" rows="3"></textarea>
       </div>
@@ -19,7 +27,7 @@
         <label for="flocksize" class="form-label">Species</label>
         <br>
         <select name="speciesId">
-          <% species.forEach((type)=> { %>
+          <% data.species.forEach((type)=> { %>
             <option value="<%= type.id %>">
               <%= type.name %>
                 (<%= type.scientific_name %>)
