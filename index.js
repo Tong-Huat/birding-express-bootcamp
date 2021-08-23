@@ -38,7 +38,7 @@ const renderNotesIndex = (request, response) => {
     }
     console.log(data);
     const dataObj = { data };
-    console.log(`result: ${dataObj}`);
+    // console.log(`result: ${dataObj}`);
 
     // response.send(data);
     response.render('index', dataObj);
@@ -59,18 +59,17 @@ const renderSpecificNote = (request, response) => {
     if (error) {
       console.log('Error executing query', error.stack);
       response.status(503).send(result.rows);
-      return;
     }
-    // console.log(data);
     const dataObj = { data };
     // console.log(`result: ${dataObj}`);
 
-    // response.send(data);
     response.render('rendernote', dataObj);
+
+    // }
   };
 
   // Query using pg.Pool instead of pg.Client
-  pool.query(`SELECT * from notes WHERE id = ${id} `, listSpecificNote);
+  pool.query(`SELECT notes.id, notes.date, notes.behaviour, notes.flocksize, notes.user_id, species.name AS species_name FROM notes INNER JOIN species ON notes.species_id = species.id WHERE notes.id = ${id}`, listSpecificNote);
 };
 
 // CB to render blank note submission form
@@ -103,8 +102,9 @@ const addNewNote = (request, response) => {
   const { date } = request.body;
   const { behaviour } = request.body;
   const { flocksize } = request.body;
+  const { speciesId } = request.body;
   // const { userId } = obj;
-  const insertData = `INSERT INTO notes (date, behaviour, flocksize, user_id) VALUES ('${date}', '${behaviour}', '${flocksize}', '${userId}')`;
+  const insertData = `INSERT INTO notes (date, behaviour, flocksize, user_id, species_id) VALUES ('${date}', '${behaviour}', '${flocksize}', '${userId}', '${speciesId}')`;
   // console.log(`1:${Number(userId)}`);
 
   pool.query(insertData, (err, result, fields) => {
@@ -212,3 +212,6 @@ const hash = shaObj.getHash('HEX');
 
 console.log('hashed text');
 console.log(hash);
+
+// species table created
+// add species_id col into notes table

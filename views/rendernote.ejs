@@ -4,17 +4,22 @@
   <div class="container">
     <form action="/sighting" method="POST">
       <div class="col-md-12 mb-3 submit-label">
-        <label for="date" class="form-label">Text</label>
+        <label for="date" class="form-label">DATE</label>
         <textarea disabled class="form-control" name="date" rows="3"><%= data[0].date %></textarea>
       </div>
       <div class="col-md-12 mb-3 submit-label">
-        <label for="behavior" class="form-label">Text</label>
+        <label for="behavior" class="form-label">BEHAVIOR</label>
         <textarea disabled class="form-control" name="behavior" rows="3"><%= data[0].behaviour %></textarea>
       </div>
       <div class="col-md-12 mb-3 submit-label">
-        <label for="flocksize" class="form-label">Text</label>
+        <label for="flocksize" class="form-label">FLOCKSIZE</label>
         <textarea disabled class="form-control" name="flocksize" rows="3"><%= data[0].flocksize %></textarea>
       </div>
+      <div class="col-md-12 mb-3 submit-label">
+        <label for="flocksize" class="form-label">SPECIES NAME</label>
+        <textarea disabled class="form-control" name="speciesId" rows="3"><%= data[0].species_name %></textarea>
+      </div>
+
 
       <br>
       <br>
