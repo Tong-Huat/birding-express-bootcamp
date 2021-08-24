@@ -103,20 +103,44 @@ const addNewNote = (request, response) => {
   const { userId } = cookiesHashmap;
   console.log(`2:${userId}`);
   const { date } = request.body;
-  const { behaviour } = request.body;
   const { flocksize } = request.body;
   const { speciesId } = request.body;
-  // const { userId } = obj;
-  const insertData = `INSERT INTO notes (date, behaviour, flocksize, user_id, species_id) VALUES ('${date}', '${behaviour}', '${flocksize}', '${userId}', '${speciesId}')`;
-  // console.log(`1:${Number(userId)}`);
+  const { behaviours } = request.body;
+  const insertEntryQuery = `INSERT INTO notes (date, flocksize, user_id, species_id) VALUES ('${date}', '${flocksize}', '${userId}', '${speciesId}') RETURNING id`;
+  console.log(date, flocksize, speciesId, userId);
+  // eslint-disable-next-line no-loop-func
+  pool.query(insertEntryQuery, (insertEntryErr, insertEntryResult) => {
+    if (insertEntryErr) {
+      console.log('Insert error', insertEntryErr);
+    } else {
+      const noteId = insertEntryResult.rows[0].id;
+      console.log(noteId);
+      console.log('behaviour:', behaviours);
+      behaviours.forEach((behaviour) => {
+        const behaviourIdQuery = `SELECT id FROM birds_behaviours WHERE birds_behaviour = '${behaviour}'`;
 
-  pool.query(insertData, (err, result, fields) => {
-    if (err) {
-      return response.status(500).send(err); /* return error message if insert unsuccessful */
+        pool.query(behaviourIdQuery, (behaviourIdQueryError, behaviourIdQueryResult) => {
+          if (behaviourIdQueryError) {
+            console.log('error', behaviourIdQueryError);
+          } else {
+            console.log('behaviour id:', behaviourIdQueryResult.rows);
+            const behaviourId = behaviourIdQueryResult.rows[0].id;
+            const behaviourData = [noteId, behaviourId];
+
+            const notesBehaviourEntry = 'INSERT INTO notes_behaviour (note_index, behaviour_id) VALUES ($1, $2)';
+
+            pool.query(notesBehaviourEntry, behaviourData, (notesBehaviourEntryError, notesBehaviourEntryResult) => {
+              if (notesBehaviourEntryError) {
+                console.log('error', notesBehaviourEntryError);
+              } else {
+                console.log('done');
+              }
+            });
+          }
+        });
+      });
+      response.redirect('/');
     }
-    console.log(`length:${result.rows.length}`);
-
-    response.redirect('/');
   });
 };
 
@@ -129,11 +153,19 @@ const renderRegistration = (request, response) => {
 // CB to retrieve user's data for registration
 const registerUser = (request, response) => {
   console.log('retrieving user data');
-  const { email } = request.body;
-  const { password } = request.body;
-  const insertData = `INSERT INTO users (email, password) VALUES ('${email}', '${password}')`;
+  // initialise the SHA object
+  const shaObj = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
+  // input the password from the request to the SHA object
+  shaObj.update(request.body.password);
+  // get the hashed password as output from the SHA object
+  const hashedPassword = shaObj.getHash('HEX');
 
-  pool.query(insertData, (err, result, fields) => {
+  // store the hashed password in our DB
+  const values = [request.body.email, hashedPassword];
+
+  const insertData = 'INSERT INTO users (email, password) VALUES ($1, $2)';
+
+  pool.query(insertData, values, (err, result) => {
     if (err) {
       return response.status(500).send(err); /* return error message if insert unsuccessful */
     }
@@ -159,24 +191,32 @@ const loginAccount = (request, response) => {
       return;
     }
 
+    //  we didnt find a user with that email.
     if (result.rows.length === 0) {
-      /* we didnt find a user with that email.
-       the error for password and user are the same. don't tell the user which error they got for security reasons, otherwise people can guess if a person is a user of a given service. */
+      /* the error for password and user are the same. don't tell the user which error they got for security reasons, otherwise people can guess if a person is a user of a given service. */
       response.status(403).send('sorry!');
       return;
     }
 
+    // get user record from results
     const user = result.rows[0];
+    // initialise SHA object
+    const shaObj = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
+    // input the password from the request to the SHA object
+    shaObj.update(request.body.password);
+    // get the hashed value as output from the SHA object
+    const hashedPassword = shaObj.getHash('HEX');
 
-    if (user.password === request.body.password) {
+    // If the user's hashed password in the database does not match the hashed input password, login fails
+    if (user.password !== hashedPassword) {
+      // the error for incorrect email and incorrect password are the same for security reasons.
+      // This is to prevent detection of whether a user has an account for a given service.
+      response.status(403).send('login failed!');
+    } else {
       console.log('login successful');
-      response.cookie('userId', user.id);
+
       response.cookie('loggedIn', true);
       response.redirect('/loginsuccess');
-    } else {
-      // password didn't match
-      // the error for password and user are the same. don't tell the user which error they got for security reasons, otherwise people can guess if a person is a user of a given service.
-      response.status(403).send('sorry!!');
     }
   });
 };
@@ -207,14 +247,3 @@ app.get('/loginsuccess', successfulLogin);
 app.get('/logout', logout);
 
 app.listen(3004);
-
-const shaObj = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
-// 'Text to hash" is the string to be converted
-shaObj.update('Text to hash.');
-const hash = shaObj.getHash('HEX');
-
-console.log('hashed text');
-console.log(hash);
-
-// species table created
-// add species_id col into notes table

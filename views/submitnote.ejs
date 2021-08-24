@@ -8,15 +8,11 @@
         <textarea type="date" class="form-control" name="date" rows="3" placeholder="yyyy-mm-dd"></textarea>
       </div>
       <div class="col-md-12 mb-3 submit-label">
-        <label for="behaviour" class="form-label">Behaviour</label>
-        <textarea class="form-control" name="behaviour" rows="3"></textarea>
-      </div>
-      <div class="col-md-12 mb-3 submit-label">
         <% data2.behaviours.forEach((behaviour)=> { %>
           <label>
             <%= behaviour.birds_behaviour %>
           </label>
-          <input type="checkbox" name="birdsBehavioursId" value="<%= behaviour.id %>" />
+          <input type="checkbox" name="behaviours" value="<%= behaviour.id %>" />
           <% }); %>
       </div>
       <div class="col-md-12 mb-3 submit-label">
