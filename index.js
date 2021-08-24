@@ -4,6 +4,7 @@ import methodOverride from 'method-override';
 // eslint-disable-next-line import/no-unresolved
 import pg from 'pg';
 import jsSHA from 'jssha';
+// import * as jsSHA from 'jssha';
 import cookieParser from 'cookie-parser';
 // const PORT = process.argv[2];
 
@@ -79,12 +80,14 @@ const renderSpecificNote = (request, response) => {
 
 // CB to render blank note submission form
 const renderNoteSubmission = (request, response) => {
+  let jsSha;
   console.log('submit request came in');
-  // // extract loggedInHash and userId from request cookies
+  // extract loggedInHash and userId from request cookies
   // const { loggedInHash, userId } = request.cookies;
-  // console.log('loggedinHASh', loggedInHash.request.cookies);
-  // console.log('userID', userId.request.cookies);
+  // // console.log('loggedinHASh', loggedInHash.request.cookies);
+  // // console.log('userID', userId.request.cookies);
   // // create new SHA object
+  // // eslint-disable-next-line new-cap
   // const shaObj = new jsSha('SHA-512', 'TEXT', { encoding: 'UTF8' });
   // // reconstruct the hashed cookie string
   // const unhashedCookieString = `${userId}-${SALT}`;
@@ -109,18 +112,18 @@ const renderNoteSubmission = (request, response) => {
 
 // CB to add new note filled by user
 const addNewNote = (request, response) => {
-  const cookiesArray = request.headers.cookie.split(';').map((cookie) => cookie.trim());
-  const cookiesHashmap = cookiesArray.reduce((all, cookie) => {
-    const [cookieName, value] = cookie.split('=');
-    return {
-      [cookieName]: value,
-      ...all,
-    };
-  }, {});
-  console.log(`3:${cookiesHashmap.userId}`);
-  const { userId } = cookiesHashmap;
+  // const cookiesArray = request.headers.cookie.split(';').map((cookie) => cookie.trim());
+  // const cookiesHashmap = cookiesArray.reduce((all, cookie) => {
+  //   const [cookieName, value] = cookie.split('=');
+  //   return {
+  //     [cookieName]: value,
+  //     ...all,
+  //   };
+  // }, {});
+  // console.log(`3:${cookiesHashmap.userId}`);
+  // const { userId } = cookiesHashmap;
   // console.log(`2:${userId}`);
-  // const { userId } = request.cookies;
+  const { userId } = request.cookies;
   console.log('userid:', userId);
   const { date } = request.body;
   const { flocksize } = request.body;
@@ -173,7 +176,7 @@ const renderRegistration = (request, response) => {
 // CB to retrieve user's data for registration
 const registerUser = (request, response) => {
   console.log('retrieving user data');
-  // initialise the SHA object
+  // initialise the jsSHA object
   const shaObj = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
   // input the password from the request to the SHA object
   shaObj.update(request.body.password);
@@ -217,18 +220,6 @@ const loginAccount = (request, response) => {
       response.status(403).send('sorry!');
       return;
     }
-
-    // const shaObj = new jsSha('SHA-512', 'TEXT', { encoding: 'UTF8' });
-
-    // const unhashedCookieString = `${result.rows[0].id}-${SALT}`;
-    // // generate a hashed cookie string using SHA object
-    // shaObj.update(unhashedCookieString);
-    // const hashedCookieString = shaObj.getHash('HEX');
-    // // set the loggedInHash and userId cookies in the response
-    // response.cookie('loggedInHash', hashedCookieString);
-    // response.cookie('userId', result.rows[0].id);
-    // // end the request-response cycle
-    // console.log('login successful');
 
     // create new SHA object
     const shaObj = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
