@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS species (id SERIAL PRIMARY KEY, name TEXT, scientific
 CREATE TABLE IF NOT EXISTS birds_behaviours (id SERIAL PRIMARY KEY, birds_behaviour TEXT);
 CREATE TABLE IF NOT EXISTS notes_behaviour (id SERIAL PRIMARY KEY, note_id INTEGER, behaviour_id INTEGER);
 CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, email TEXT, password TEXT);
-
+CREATE TABLE IF NOT EXISTS comments (id SERIAL PRIMARY KEY, comment TEXT, note_id INTEGER, user_id INTEGER);
 
 -- INSERT INTO notes (date, behaviour, flocksize, user_id) VALUES ('2021-01-27', 'watched a flock of yellow birds feeding for 5mins with clear views', 10, 1);
 -- INSERT INTO notes (date, behaviour, flocksize, user_id) VALUES ('2021-02-23', 'watched the birds flying for 5mins with clear views', 4, 2);

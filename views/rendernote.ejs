@@ -2,30 +2,37 @@
 
   <h1 style="text-align: center">Birding Note</h1>
   <div class="container">
-    <form action="/sighting" method="POST">
-      <div class="col-md-7 mb-3 submit-label">
-        <label for="date" class="form-label">DATE</label>
-        <input type="text" disabled class="form-control" name="date" rows="3" value="<%=data[0].date %>">
 
-      </div>
-      <div class=" col-md-3 mb-3 submit-label">
-        <label for="behavior" class="form-label">BEHAVIOR</label>
-        <textarea disabled class="form-control" name="behavior" rows="1"><%= data[0].behaviour %></textarea>
-      </div>
-      <div class="col-md-3 mb-3 submit-label">
-        <label for="flocksize" class="form-label">FLOCKSIZE</label>
-        <textarea disabled class="form-control" name="flocksize" rows="1"><%= data[0].flocksize %></textarea>
-      </div>
+    <div class="col-md-7 mb-3 submit-label">
+      <label for="date" class="form-label">DATE</label>
+      <input type="text" disabled class="form-control" name="date" rows="3" value="<%=data[0].date %>">
+
+    </div>
+    <div class=" col-md-3 mb-3 submit-label">
+      <label for="behavior" class="form-label">BEHAVIOR</label>
+      <textarea disabled class="form-control" name="behavior" rows="1"><%= data[0].behaviour %></textarea>
+    </div>
+    <div class="col-md-3 mb-3 submit-label">
+      <label for="flocksize" class="form-label">FLOCKSIZE</label>
+      <textarea disabled class="form-control" name="flocksize" rows="1"><%= data[0].flocksize %></textarea>
+    </div>
+    <div class="col-md-5 mb-3 submit-label">
+      <label for="flocksize" class="form-label">SPECIES NAME</label>
+      <textarea disabled class="form-control" name="speciesId" rows="1"><%= data[0].species_name %></textarea>
+    </div>
+    <div class="col-md-5 mb-3 submit-label">
+      <label for="flocksize" class="form-label">Submitted by</label>
+      <textarea disabled class="form-control" name="userId" rows="1">User ID <%= data[0].user_id %></textarea>
+    </div>
+    <form action="/note/<%= data[0].id %>/comment" method="POST">
       <div class="col-md-5 mb-3 submit-label">
-        <label for="flocksize" class="form-label">SPECIES NAME</label>
-        <textarea disabled class="form-control" name="speciesId" rows="1"><%= data[0].species_name %></textarea>
-      </div>
-      <div class="col-md-5 mb-3 submit-label">
-        <label for="flocksize" class="form-label">Submitted by</label>
-        <textarea disabled class="form-control" name="user_name" rows="1">User ID <%= data[0].user_id %></textarea>
-      </div>
+        <label for="flocksize" class="form-label">Comments</label>
+        <textarea class="form-control" name="comment" rows="3"></textarea>
+        <br>
+        <input type="submit" value="Submit Comment" />
+    </form>
+  </div>
+  <br>
+  <br>
 
-      <br>
-      <br>
-
-      <%- include('footer'); -%>
+  <%- include('footer'); -%>

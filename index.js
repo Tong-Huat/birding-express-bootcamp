@@ -15,6 +15,7 @@ app.set('view engine', 'ejs');
 app.use(methodOverride('_method'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
+app.use(cookieParser());
 
 // Initialise DB connection
 const { Pool } = pg;
@@ -291,6 +292,22 @@ const deleteNote = (request, response) => {
   });
 };
 
+const addComment = (request, response) => {
+  const { userId } = request.cookies;
+  const noteId = request.params.id;
+  const { comment } = request.body;
+  // write sql
+  const addCommentQuery = `INSERT INTO comments (comment, note_id, user_id) VALUES ('${comment}', ${noteId}, ${userId})`;
+  // query sql
+  pool.query(addCommentQuery, (addCommentQueryError, addCommentQueryResult) => {
+    if (addCommentQueryError) {
+      console.log('add comment error', addCommentQueryError);
+    } else {
+      response.redirect('/');
+    }
+  });
+};
+
 app.get('/', renderNotesIndex);
 app.get('/note/:id', renderSpecificNote);
 app.get('/note', renderNoteSubmission);
@@ -302,5 +319,6 @@ app.post('/login', loginAccount);
 app.get('/loginsuccess', successfulLogin);
 app.get('/logout', logout);
 app.delete('/note/:id', deleteNote);
+app.post('/note/:id/comment', addComment);
 
 app.listen(3004);
