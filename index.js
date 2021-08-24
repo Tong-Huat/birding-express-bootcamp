@@ -6,7 +6,8 @@ import pg from 'pg';
 import jsSHA from 'jssha';
 // import * as jsSHA from 'jssha';
 import cookieParser from 'cookie-parser';
-// const PORT = process.argv[2];
+
+const PORT = process.argv[2];
 
 const app = express();
 const SALT = 'i like cocomelon';
@@ -20,13 +21,25 @@ app.use(cookieParser());
 
 // Initialise DB connection
 const { Pool } = pg;
-const pgConnectionConfigs = {
-  user: 'midzham',
-  host: 'localhost',
-  database: 'birding',
-  port: 5432, // Postgres server always runs on this port by default
-};
-
+let pgConnectionConfigs;
+if (process.env.ENV === 'PRODUCTION') {
+  // determine how we connect to the remote Postgres server
+  pgConnectionConfigs = {
+    user: 'postgres',
+    // set DB_PASSWORD as an environment variable for security.
+    password: process.env.DB_PASSWORD,
+    host: 'localhost',
+    database: 'birding',
+    port: 5432,
+  };
+} else {
+  pgConnectionConfigs = {
+    user: 'midzham',
+    host: 'localhost',
+    database: 'birding',
+    port: 5432, // Postgres server always runs on this port by default
+  };
+}
 const pool = new Pool(pgConnectionConfigs);
 
 // CB to render index page with all the notes
@@ -312,4 +325,4 @@ app.get('/logout', logout);
 app.delete('/note/:id', deleteNote);
 app.post('/note/:id/comment', addComment);
 
-app.listen(3004);
+app.listen(PORT);
