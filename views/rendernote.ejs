@@ -3,21 +3,22 @@
   <h1 style="text-align: center">Birding Note</h1>
   <div class="container">
     <form action="/sighting" method="POST">
-      <div class="col-md-12 mb-3 submit-label">
+      <div class="col-md-7 mb-3 submit-label">
         <label for="date" class="form-label">DATE</label>
-        <textarea disabled class="form-control" name="date" rows="3"><%= data[0].date %></textarea>
+        <input type="text" disabled class="form-control" name="date" rows="3" value="<%=data[0].date %>">
+
       </div>
-      <div class="col-md-12 mb-3 submit-label">
+      <div class=" col-md-3 mb-3 submit-label">
         <label for="behavior" class="form-label">BEHAVIOR</label>
-        <textarea disabled class="form-control" name="behavior" rows="3"><%= data[0].behaviour %></textarea>
+        <textarea disabled class="form-control" name="behavior" rows="1"><%= data[0].behaviour %></textarea>
       </div>
-      <div class="col-md-12 mb-3 submit-label">
+      <div class="col-md-3 mb-3 submit-label">
         <label for="flocksize" class="form-label">FLOCKSIZE</label>
-        <textarea disabled class="form-control" name="flocksize" rows="3"><%= data[0].flocksize %></textarea>
+        <textarea disabled class="form-control" name="flocksize" rows="1"><%= data[0].flocksize %></textarea>
       </div>
-      <div class="col-md-12 mb-3 submit-label">
+      <div class="col-md-5 mb-3 submit-label">
         <label for="flocksize" class="form-label">SPECIES NAME</label>
-        <textarea disabled class="form-control" name="speciesId" rows="3"><%= data[0].species_name %></textarea>
+        <textarea disabled class="form-control" name="speciesId" rows="1"><%= data[0].species_name %></textarea>
       </div>
 
 

@@ -3,21 +3,24 @@
   <h1 style="text-align: center">Submit Birding Note</h1>
   <div class="container">
     <form action="/note" method="POST">
-      <div class="col-md-12 mb-3 submit-label">
+      <div class="col-md-3 mb-3 submit-label">
         <label for="date" class="form-label">Date</label>
-        <textarea type="date" class="form-control" name="date" rows="3" placeholder="yyyy-mm-dd"></textarea>
+        <input type="date" class="form-control" name="date" rows="3">
       </div>
       <div class="col-md-12 mb-3 submit-label">
+        <label for="behaviour" class="form-label">Behaviours of Birds</label>
+        <br>
+        <!-- <textarea type="date" class="form-control" name="behaviour" rows="3" placeholder="yyyy-mm-dd"></textarea> -->
         <% data2.behaviours.forEach((behaviour)=> { %>
           <label>
             <%= behaviour.birds_behaviour %>
           </label>
-          <input type="checkbox" name="behaviours" value="<%= behaviour.id %>" />
+          <input type="checkbox" name="behaviours" value="<%= behaviour.birds_behaviour %>" />
           <% }); %>
       </div>
-      <div class="col-md-12 mb-3 submit-label">
+      <div class="col-md-3 mb-3 submit-label">
         <label for="flocksize" class="form-label">Flock Size</label>
-        <textarea class="form-control" name="flocksize" rows="3"></textarea>
+        <input type="number" min="1" class="form-control" name="flocksize" rows="3">
       </div>
       <div class="col-md-12 mb-3 submit-label">
         <label for="flocksize" class="form-label">Species</label>

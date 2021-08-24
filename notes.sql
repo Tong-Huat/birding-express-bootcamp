@@ -8,7 +8,7 @@ DROP TABLE users;
 CREATE TABLE IF NOT EXISTS notes (id SERIAL PRIMARY KEY, date DATE, behaviour TEXT, flocksize INTEGER, user_id INTEGER, species_id INTEGER);
 CREATE TABLE IF NOT EXISTS species (id SERIAL PRIMARY KEY, name TEXT, scientific_name TEXT);
 CREATE TABLE IF NOT EXISTS birds_behaviours (id SERIAL PRIMARY KEY, birds_behaviour TEXT);
-CREATE TABLE IF NOT EXISTS notes_behaviour (id SERIAL PRIMARY KEY, note_index INTEGER, behaviour_id INTEGER);
+CREATE TABLE IF NOT EXISTS notes_behaviour (id SERIAL PRIMARY KEY, note_id INTEGER, behaviour_id INTEGER);
 CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, email TEXT, password TEXT);
 
 
@@ -27,3 +27,8 @@ INSERT INTO species (name, scientific_name) VALUES ('Common Swift','Apus apus');
 
 
 INSERT INTO birds_behaviours (birds_behaviour) VALUES ('Walking'), ('Drinking'),('Gathering nesting materials'), ('Hunting'),('Soaring'), ('Perched'),('Feeding'), ('Flocking');
+
+INSERT INTO notes_behaviour (note_id, behaviour_id) VALUES (1,1),(1,2),(1,3);
+--  pool.query(`SELECT notes.id, notes.date, notes.behaviour, notes.flocksize, notes.user_id, species.name AS species_name FROM notes INNER JOIN species ON notes.species_id = species.id INNER JOIN users ON notes.user_id = users.id INNER JOIN birds_behaviours ON birds_behaviours.birds_behaviour = users.behaviour WHERE notes.id = ${id}`, listSpecificNote);
+
+UPDATE notes SET behaviour = 'Hunting' WHERE id=1;

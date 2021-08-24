@@ -4,9 +4,11 @@ import methodOverride from 'method-override';
 // eslint-disable-next-line import/no-unresolved
 import pg from 'pg';
 import jsSHA from 'jssha';
+import cookieParser from 'cookie-parser';
 // const PORT = process.argv[2];
 
 const app = express();
+const SALT = 'i like cocomelon';
 
 app.set('view engine', 'ejs');
 // Override POST requests with query param ?_method=PUT to be PUT requests
@@ -55,6 +57,7 @@ const renderSpecificNote = (request, response) => {
 
   const listSpecificNote = (error, result) => {
     const data = result.rows;
+    console.log(data);
 
     if (error) {
       console.log('Error executing query', error.stack);
@@ -69,14 +72,28 @@ const renderSpecificNote = (request, response) => {
   };
 
   // Query using pg.Pool instead of pg.Client
-  pool.query(`SELECT notes.id, notes.date, notes.behaviour, notes.flocksize, notes.user_id, species.name AS species_name FROM notes INNER JOIN species ON notes.species_id = species.id WHERE notes.id = ${id}`, listSpecificNote);
+  pool.query(`SELECT notes.id, notes.date, notes.behaviour, notes.flocksize, notes.user_id, species.name AS species_name FROM notes INNER JOIN species ON notes.species_id = species.id INNER JOIN users ON notes.user_id = users.id INNER JOIN notes_behaviour ON notes_behaviour.note_id = notes.id WHERE notes.id = 
+  ${id}`, listSpecificNote);
 };
 
 // CB to render blank note submission form
 const renderNoteSubmission = (request, response) => {
   console.log('submit request came in');
-  // if (request.cookies.loggedIn === undefined) {
-  //   response.status(403).send('sorry, please log in!');
+  // // extract loggedInHash and userId from request cookies
+  // const { loggedInHash, userId } = request.cookies;
+  // console.log('loggedinHASh', loggedInHash.request.cookies);
+  // console.log('userID', userId.request.cookies);
+  // // create new SHA object
+  // const shaObj = new jsSha('SHA-512', 'TEXT', { encoding: 'UTF8' });
+  // // reconstruct the hashed cookie string
+  // const unhashedCookieString = `${userId}-${SALT}`;
+  // shaObj.update(unhashedCookieString);
+  // const hashedCookieString = shaObj.getHash('HEX');
+
+  // // verify if the generated hashed cookie string matches the request cookie value.
+  // // if hashed value doesn't match, return 403.
+  // if (hashedCookieString !== request.cookies.loggedInHash) {
+  //   response.status(403).send('please login!');
   //   return;
   // }
   pool.query('SELECT * FROM species', (error, result) => {
@@ -101,12 +118,14 @@ const addNewNote = (request, response) => {
   }, {});
   console.log(`3:${cookiesHashmap.userId}`);
   const { userId } = cookiesHashmap;
-  console.log(`2:${userId}`);
+  // console.log(`2:${userId}`);
+  // const { userId } = request.cookies;
+  console.log('userid:', userId);
   const { date } = request.body;
   const { flocksize } = request.body;
   const { speciesId } = request.body;
   const { behaviours } = request.body;
-  const insertEntryQuery = `INSERT INTO notes (date, flocksize, user_id, species_id) VALUES ('${date}', '${flocksize}', '${userId}', '${speciesId}') RETURNING id`;
+  const insertEntryQuery = `INSERT INTO notes (date, flocksize, user_id, species_id, behaviour) VALUES ('${date}', '${flocksize}', '${userId}', '${speciesId}', '${behaviours}') RETURNING id`;
   console.log(date, flocksize, speciesId, userId);
   // eslint-disable-next-line no-loop-func
   pool.query(insertEntryQuery, (insertEntryErr, insertEntryResult) => {
@@ -127,7 +146,7 @@ const addNewNote = (request, response) => {
             const behaviourId = behaviourIdQueryResult.rows[0].id;
             const behaviourData = [noteId, behaviourId];
 
-            const notesBehaviourEntry = 'INSERT INTO notes_behaviour (note_index, behaviour_id) VALUES ($1, $2)';
+            const notesBehaviourEntry = 'INSERT INTO notes_behaviour (note_id, behaviour_id) VALUES ($1, $2)';
 
             pool.query(notesBehaviourEntry, behaviourData, (notesBehaviourEntryError, notesBehaviourEntryResult) => {
               if (notesBehaviourEntryError) {
@@ -186,8 +205,8 @@ const loginAccount = (request, response) => {
   console.log(values);
   pool.query('SELECT * FROM users WHERE email=$1', values, (error, result) => {
     if (error) {
-      console.log('Error executing query', error.stack);
-      response.status(503).send(result.rows);
+      console.log('Error executing query', error);
+      response.status(503).send('request failed');
       return;
     }
 
@@ -198,25 +217,36 @@ const loginAccount = (request, response) => {
       return;
     }
 
-    // get user record from results
-    const user = result.rows[0];
-    // initialise SHA object
+    // const shaObj = new jsSha('SHA-512', 'TEXT', { encoding: 'UTF8' });
+
+    // const unhashedCookieString = `${result.rows[0].id}-${SALT}`;
+    // // generate a hashed cookie string using SHA object
+    // shaObj.update(unhashedCookieString);
+    // const hashedCookieString = shaObj.getHash('HEX');
+    // // set the loggedInHash and userId cookies in the response
+    // response.cookie('loggedInHash', hashedCookieString);
+    // response.cookie('userId', result.rows[0].id);
+    // // end the request-response cycle
+    // console.log('login successful');
+
+    // create new SHA object
     const shaObj = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
-    // input the password from the request to the SHA object
     shaObj.update(request.body.password);
-    // get the hashed value as output from the SHA object
     const hashedPassword = shaObj.getHash('HEX');
-
-    // If the user's hashed password in the database does not match the hashed input password, login fails
-    if (user.password !== hashedPassword) {
-      // the error for incorrect email and incorrect password are the same for security reasons.
-      // This is to prevent detection of whether a user has an account for a given service.
-      response.status(403).send('login failed!');
-    } else {
-      console.log('login successful');
-
+    console.log(hashedPassword);
+    if (result.rows[0].password === hashedPassword) {
       response.cookie('loggedIn', true);
+
+      const shaObj1 = new jsSHA('SHA-512', 'TEXT', { encoding: 'UTF8' });
+      // create an unhashed cookie string based on user ID and salt
+      const unhashedCookieString = `${result.rows[0].id}-${SALT}`;
+      shaObj1.update(unhashedCookieString);
+      const hashedCookieString = shaObj1.getHash('HEX');
+      response.cookie('loggedInHash', hashedCookieString);
+      response.cookie('userId', result.rows[0].id);
       response.redirect('/loginsuccess');
+    } else {
+      response.status(403).send('not successful');
     }
   });
 };
@@ -235,6 +265,32 @@ const logout = (request, response) => {
   response.redirect('/');
 };
 
+// CB to del note
+const deleteNote = (request, response) => {
+  // Remove element from DB at given index
+  const { id } = request.params;
+  console.log('id:', id);
+  const getNoteDataQuery = `SELECT * FROM notes WHERE id = ${id}`;
+  pool.query(getNoteDataQuery, (getNoteDataQueryErr, getNoteDataQueryResult) => {
+    if (getNoteDataQueryErr) {
+      console.log('error', getNoteDataQueryErr);
+    } else {
+      const noteData = getNoteDataQueryResult.rows[0];
+      console.log('note Data: ', noteData);
+
+      const deleteNoteQuery = `DELETE FROM notes WHERE id = ${id}`;
+      pool.query(deleteNoteQuery, (deleteNoteError, deleteNoteResult) => {
+        if (deleteNoteError) {
+          console.log('error', deleteNoteError);
+        } else
+        {
+          response.redirect('/');
+        }
+      });
+    }
+  });
+};
+
 app.get('/', renderNotesIndex);
 app.get('/note/:id', renderSpecificNote);
 app.get('/note', renderNoteSubmission);
@@ -245,5 +301,6 @@ app.get('/login', renderLogin);
 app.post('/login', loginAccount);
 app.get('/loginsuccess', successfulLogin);
 app.get('/logout', logout);
+app.delete('/note/:id', deleteNote);
 
 app.listen(3004);
