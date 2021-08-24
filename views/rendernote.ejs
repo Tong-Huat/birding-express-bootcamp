@@ -20,7 +20,10 @@
         <label for="flocksize" class="form-label">SPECIES NAME</label>
         <textarea disabled class="form-control" name="speciesId" rows="1"><%= data[0].species_name %></textarea>
       </div>
-
+      <div class="col-md-5 mb-3 submit-label">
+        <label for="flocksize" class="form-label">Submitted by</label>
+        <textarea disabled class="form-control" name="user_name" rows="1">User ID <%= data[0].user_id %></textarea>
+      </div>
 
       <br>
       <br>

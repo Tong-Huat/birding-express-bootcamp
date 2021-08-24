@@ -14,10 +14,10 @@
       <% for (let i=0; i < data.length; i +=1) {%>
         <tr>
           <th scope="row" class="theader">
-            <%= i +1 %>
+            <%= data[i].id %>
           </th>
           <td class="tdata">
-            <a href="<%= `/note/${i + 1}` %>">
+            <a href="<%= `/note/${data[i].id}` %>">
               <%= data[i].date %>
             </a>
           </td>
